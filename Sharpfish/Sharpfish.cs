@@ -172,10 +172,14 @@ public class Stockfish
     /// <exception cref="FileNotFoundException"></exception>
     public void SetOption(UCIOption option, object value)
     {
+        if (value == null)
+            throw new ArgumentNullException("value");
+        string valueString = value.ToString() ?? "";
+        
         switch(option) 
         {
             case UCIOption.Threads:
-                if (int.TryParse(value.ToString(), out int threads))
+                if (int.TryParse(valueString, out int threads))
                 {
                     if (threads > 0 && threads <= 1024)
                         SetOption("Threads", threads.ToString());
@@ -188,7 +192,7 @@ public class Stockfish
                 }
                 break;
             case UCIOption.Hash:
-                if (int.TryParse(value.ToString(), out int hashSizeInMb))
+                if (int.TryParse(valueString, out int hashSizeInMb))
                 {
                     if (hashSizeInMb > 0 && hashSizeInMb <= 33554432)
                         SetOption("Hash", hashSizeInMb.ToString());
@@ -200,7 +204,7 @@ public class Stockfish
                 SetOption("Clear Hash", "");
                 break;
             case UCIOption.Ponder:
-                if (bool.TryParse(value.ToString(), out bool ponder))
+                if (bool.TryParse(valueString, out bool ponder))
                 {
                     SetOption("Ponder", ponder ? "true" : "false");
                 }
@@ -210,7 +214,7 @@ public class Stockfish
                 }
                 break;
             case UCIOption.MultiPV:
-                if (int.TryParse(value.ToString(), out int  multiPV))
+                if (int.TryParse(valueString, out int  multiPV))
                 {
                     if (multiPV > 0 && multiPV <= 500)
                     {
@@ -223,17 +227,17 @@ public class Stockfish
                 }
                 break;
             case UCIOption.EvalFile:
-                if (File.Exists(value.ToString()))
+                if (File.Exists(valueString))
                 {
-                    SetOption("EvalFile", value.ToString());
+                    SetOption("EvalFile", valueString);
                 }
                 else
                 {
-                    throw new FileNotFoundException(value.ToString());
+                    throw new FileNotFoundException(valueString);
                 }
                 break;
             case UCIOption.UCI_Chess960:
-                if (bool.TryParse(value.ToString(), out bool chess960))
+                if (bool.TryParse(valueString, out bool chess960))
                 {
                     SetOption("UCI_Chess960", chess960 ? "true" : "false");
                 }
@@ -243,7 +247,7 @@ public class Stockfish
                 }
                 break;
             case UCIOption.UCI_ShowWDL:
-                if (bool.TryParse(value.ToString(), out bool showWDL))
+                if (bool.TryParse(valueString, out bool showWDL))
                 {
                     SetOption("UCI_ShowWDL", showWDL ? "true" : "false");
                 }
@@ -253,7 +257,7 @@ public class Stockfish
                 }
                 break;
             case UCIOption.UCI_LimitStrength:
-                if (bool.TryParse(value.ToString(), out bool limitStrength))
+                if (bool.TryParse(valueString, out bool limitStrength))
                 {
                     SetOption("UCI_LimitStrength", limitStrength ? "true" : "false");
                 }
@@ -263,7 +267,7 @@ public class Stockfish
                 }
                 break;
             case UCIOption.UCI_Elo:
-                if (int.TryParse(value.ToString(), out int elo))
+                if (int.TryParse(valueString, out int elo))
                 {
                     if (elo >= 1320 && elo <= 3190)
                     {
@@ -276,7 +280,7 @@ public class Stockfish
                 }
                 break;
             case UCIOption.Skill_Level:
-                if (int.TryParse(value.ToString(), out int skillLevel))
+                if (int.TryParse(valueString, out int skillLevel))
                 {
                     if (skillLevel >= 0 && skillLevel <= 20)
                     {
@@ -286,6 +290,105 @@ public class Stockfish
                     {
                         throw new ArgumentOutOfRangeException("Skill level value", "Must be greater than or equal to 0 and less than or equal to 20");
                     }
+                }
+                break;
+            case UCIOption.SyzygyPath:
+                if (Directory.Exists(valueString))
+                {
+                    SetOption("SyzygyPath", valueString);
+                }
+                else
+                {
+                    throw new DirectoryNotFoundException(valueString);
+                }
+                break;
+            case UCIOption.SyzygyProbeDepth:
+                if (int.TryParse(valueString, out int probeDepth))
+                {
+                    if (probeDepth > 0 && probeDepth <= 100)
+                    {
+                        SetOption("SyzygyProbeDepth", probeDepth.ToString());
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("Probe Depth value", "Must be greater than 0 and less than or equal to 100");
+                    }
+                }
+                break;
+            case UCIOption.Syzygy50MoveRule:
+                if (bool.TryParse(valueString, out bool moveRule))
+                {
+                    SetOption("Syzygy50MoveRule", moveRule ? "true" : "false");
+                }
+                else
+                {
+                    throw new ArgumentException("Must be true or false ", nameof(value));
+                }
+                break;
+            case UCIOption.SyzygyProbeLimit:
+                if (int.TryParse(valueString, out int probeLimit))
+                {
+                    if (probeLimit >= 0 && probeLimit <= 7)
+                    {
+                        SetOption("SyzygyProbeLimit", probeLimit.ToString());
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("Probe Limit value", "Must be greater than or equal to 0 and less than or equal to 7");
+                    }
+                }
+                break;
+            case UCIOption.Move_Overhead:
+                if (int.TryParse(valueString, out int overhead))
+                {
+                    if (overhead >= 0 && overhead <= 5000)
+                    {
+                        SetOption("Move Overhead", overhead.ToString());
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("Move overhead value", "Must be greater than or equal to 0 and less than or equal to 5000");
+                    }
+                }
+                break;
+            case UCIOption.Slow_Mover:
+                if (int.TryParse(valueString, out int slowMover))
+                {
+                    if (slowMover >= 10 && slowMover <= 1000)
+                    {
+                        SetOption("Slow Mover", slowMover.ToString());
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("Slow Mover value", "Must be greater than or equal to 10 and less than or equal to 1000");
+                    }
+                }
+                break;
+            case UCIOption.NodesTime:
+                if (int.TryParse(valueString, out int nodesTime))
+                {
+                    if (nodesTime >= 0 && nodesTime <= 10000)
+                    {
+                        SetOption("nodestime", nodesTime.ToString());
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("NodesTime value", "Must be greater than or equal to 0 and less than or equal to 10000");
+                    }
+                }
+                break;
+            case UCIOption.Debug_Log_File:
+                if (!File.Exists(valueString))
+                {
+                    File.Create(valueString);                  
+                }
+                if (File.Exists(valueString))
+                {
+                    SetOption("Debug Log File", valueString);
+                }
+                else
+                {
+                    throw new FileNotFoundException(valueString);
                 }
                 break;
         }
@@ -685,7 +788,7 @@ public class Stockfish
         }
 
         // If no match is found, return null or an appropriate default value
-        return null;
+        return "";
     }
 
 }
@@ -801,7 +904,7 @@ public class GoInfo
     /// <summary>
     /// Moves in UCI format in an array of string
     /// </summary>
-    public string[] Moves { get; set; }
+    public string[] Moves { get; set; } = new string[0];
     /// <summary>
     /// Score of move, in cp (centipawns)
     /// </summary>
